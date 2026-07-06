@@ -1,6 +1,5 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const connectDB = require('../config/db');
 
 const User = require('../models/User');
@@ -23,11 +22,11 @@ const seed = async () => {
   ]);
 
   // ─── ADMIN USER ────────────────────────────────────────────────
-  const adminPassword = await bcrypt.hash('admin123', 10);
+ 
   const admin = await User.create({
     name: 'Admin',
     email: 'admin@travelbuddy.com',
-    password: adminPassword,
+    password: 'admin123',
     role: 'admin',
   });
 
@@ -35,7 +34,7 @@ const seed = async () => {
   await User.create({
     name: 'John Traveller',
     email: 'user@travelbuddy.com',
-    password: adminPassword,
+    password: 'admin123',
     role: 'user',
     bio: 'Travel enthusiast exploring the world one city at a time.',
   });
@@ -47,7 +46,7 @@ const seed = async () => {
       country: 'India',
       description: 'The city of dreams, India\'s financial capital blending colonial heritage with modern energy.',
       population: '20 million',
-      language: 'Hindi, Marathi, English',
+      languages: 'Hindi, Marathi, English',
       climate: 'Tropical, hot and humid',
       culture: 'Diverse, cosmopolitan mix of communities',
       bestSeason: 'Winter',
@@ -70,7 +69,7 @@ const seed = async () => {
       country: 'India',
       description: 'The Pink City, Rajasthan\'s royal capital famous for its magnificent forts and palaces.',
       population: '3.1 million',
-      language: 'Hindi, Rajasthani',
+      languages: 'Hindi, Rajasthani',
       climate: 'Semi-arid, hot summers and mild winters',
       culture: 'Rich Rajput heritage, vibrant arts and crafts',
       bestSeason: 'Winter',
@@ -93,7 +92,7 @@ const seed = async () => {
       country: 'India',
       description: 'India\'s beach paradise with stunning coastlines, Portuguese heritage, and vibrant nightlife.',
       population: '1.5 million',
-      language: 'Konkani, English, Portuguese',
+      languages: 'Konkani, English, Portuguese',
       climate: 'Tropical, warm year-round',
       culture: 'Blend of Indian and Portuguese cultures',
       bestSeason: 'Winter',

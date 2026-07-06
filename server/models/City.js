@@ -17,7 +17,7 @@ const citySchema = new mongoose.Schema(
       required: [true, 'Description is required'],
     },
     population: String,
-    language: String,
+    languages: String,
     climate: String,
     culture: String,
     bestSeason: {
