@@ -4,8 +4,19 @@ import axiosInstance from '../utils/axiosInstance';
 export const cityAPI = {
   getAll: (params) => axiosInstance.get('/cities', { params }),
   getOne: (id) => axiosInstance.get(`/cities/${id}`),
-  create: (data) => axiosInstance.post('/cities', data),
-  update: (id, data) => axiosInstance.put(`/cities/${id}`, data),
+ create: (data) =>
+  axiosInstance.post('/cities', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+
+update: (id, data) =>
+  axiosInstance.put(`/cities/${id}`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   delete: (id) => axiosInstance.delete(`/cities/${id}`),
   addPhoto: (id, formData) => axiosInstance.post(`/cities/${id}/photos`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };

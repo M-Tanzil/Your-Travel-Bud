@@ -1,5 +1,7 @@
 const City = require('../models/City');
 const Event = require('../models/Event');
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
 
 // @desc    Get all cities
 // @route   GET /api/v1/cities
@@ -53,8 +55,45 @@ const getCity = async (req, res, next) => {
 // @route   POST /api/v1/cities
 const createCity = async (req, res, next) => {
   try {
-    const city = await City.create(req.body);
-    res.status(201).json({ success: true, message: 'City created', data: city });
+    let photos = [];
+
+    // Parse nested JSON fields
+    if (req.body.coordinates) {
+      req.body.coordinates = JSON.parse(req.body.coordinates);
+    }
+
+    if (req.body.publicTransport) {
+      req.body.publicTransport = JSON.parse(req.body.publicTransport);
+    }
+
+    if (req.body.mustTryFoods) {
+      req.body.mustTryFoods = JSON.parse(req.body.mustTryFoods);
+    }
+
+    // Upload image to Cloudinary
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "travel-buddy/cities",
+      });
+
+      fs.unlinkSync(req.file.path);
+
+      photos.push({
+        url: result.secure_url,
+        caption: req.body.caption || "",
+      });
+    }
+
+    const city = await City.create({
+      ...req.body,
+      photos,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "City created successfully",
+      data: city,
+    });
   } catch (error) {
     next(error);
   }
@@ -64,14 +103,59 @@ const createCity = async (req, res, next) => {
 // @route   PUT /api/v1/cities/:id
 const updateCity = async (req, res, next) => {
   try {
-    const city = await City.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!city) return res.status(404).json({ success: false, message: 'City not found' });
-    res.json({ success: true, message: 'City updated', data: city });
+    // Parse JSON fields
+    if (req.body.coordinates && typeof req.body.coordinates === "string") {
+      req.body.coordinates = JSON.parse(req.body.coordinates);
+    }
+
+    if (req.body.publicTransport && typeof req.body.publicTransport === "string") {
+      req.body.publicTransport = JSON.parse(req.body.publicTransport);
+    }
+
+    if (req.body.mustTryFoods && typeof req.body.mustTryFoods === "string") {
+      req.body.mustTryFoods = JSON.parse(req.body.mustTryFoods);
+    }
+
+    const city = await City.findById(req.params.id);
+
+    if (!city) {
+      return res.status(404).json({
+        success: false,
+        message: "City not found",
+      });
+    }
+
+    // Update fields
+    Object.assign(city, req.body);
+
+    // Upload new image
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "travel-buddy/cities",
+      });
+
+      fs.unlinkSync(req.file.path);
+
+      city.photos = [
+        {
+          url: result.secure_url,
+          caption: req.body.caption || "",
+        },
+      ];
+    }
+
+    await city.save();
+
+    res.json({
+      success: true,
+      message: "City updated successfully",
+      data: city,
+    });
+
   } catch (error) {
     next(error);
   }
 };
-
 // @desc    Delete city (admin)
 // @route   DELETE /api/v1/cities/:id
 const deleteCity = async (req, res, next) => {
@@ -86,20 +170,47 @@ const deleteCity = async (req, res, next) => {
 
 // @desc    Add photo to city (admin)
 // @route   POST /api/v1/cities/:id/photos
+
+
 const addCityPhoto = async (req, res, next) => {
   try {
     const city = await City.findById(req.params.id);
-    if (!city) return res.status(404).json({ success: false, message: 'City not found' });
 
-    const photo = {
-      url: req.file ? `/uploads/${req.file.filename}` : req.body.url,
-      caption: req.body.caption,
-    };
+    if (!city) {
+      return res.status(404).json({
+        success: false,
+        message: "City not found",
+      });
+    }
 
-    city.photos.push(photo);
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload an image",
+      });
+    }
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "travel-buddy/cities",
+    });
+
+    // Delete temporary local file
+    fs.unlinkSync(req.file.path);
+
+    // Save Cloudinary URL
+    city.photos.push({
+      url: result.secure_url,
+      caption: req.body.caption || "",
+    });
+
     await city.save();
 
-    res.json({ success: true, message: 'Photo added', data: city.photos });
+    res.json({
+      success: true,
+      message: "Photo uploaded successfully",
+      data: city.photos,
+    });
   } catch (error) {
     next(error);
   }

@@ -4,6 +4,7 @@ import { cityAPI, placeAPI, hotelAPI, hiddenGemAPI, adminAPI } from '../../api';
 import AdminSidebar from '../../components/common/AdminSidebar';
 import Spinner from '../../components/common/Spinner';
 
+
 // Generic CRUD table for admin content management
 const AdminContentPage = ({ title, icon, type }) => {
   const [items, setItems] = useState([]);
@@ -14,6 +15,8 @@ const AdminContentPage = ({ title, icon, type }) => {
   const [saving, setSaving] = useState(false);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({});
+  const [image, setImage] = useState(null);
+const [preview, setPreview] = useState("");
 
   const api = {
     cities: cityAPI,
@@ -36,24 +39,67 @@ const AdminContentPage = ({ title, icon, type }) => {
 
   useEffect(() => { load(); }, [page]);
 
-  const openCreate = () => { setEditing(null); setForm({}); setShowModal(true); };
-  const openEdit = (item) => { setEditing(item); setForm({ ...item }); setShowModal(true); };
+  const openCreate = () => {
+  setEditing(null);
+  setForm({});
+  setImage(null);
+  setPreview("");
+  setShowModal(true);
+};
+  const openEdit = (item) => {
+  setEditing(item);
+  setForm({ ...item });
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      if (editing) {
-        await api.update(editing._id, form);
-      } else {
-        await api.create(form);
-      }
-      setShowModal(false);
-      load();
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to save');
+  setImage(null);
+  setPreview(item.photos?.[0]?.url || "");
+
+  setShowModal(true);
+};
+
+ const handleSave = async () => {
+  setSaving(true);
+
+  try {
+    const formData = new FormData();
+
+    // Append all form fields
+    Object.keys(form).forEach((key) => {
+  const value = form[key];
+
+  if (value !== undefined && value !== null) {
+    if (
+      typeof value === "object" &&
+      !(value instanceof File) &&
+      !Array.isArray(value)
+    ) {
+      formData.append(key, JSON.stringify(value));
+    } else if (Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+    } else {
+      formData.append(key, value);
     }
-    setSaving(false);
-  };
+  }
+});
+
+    // Append image if selected
+    if (image) {
+      formData.append("image", image);
+    }
+
+    if (editing) {
+      await api.update(editing._id, formData);
+    } else {
+      await api.create(formData);
+    }
+
+    setShowModal(false);
+    load();
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed to save");
+  }
+
+  setSaving(false);
+};
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this item?')) return;
@@ -205,6 +251,37 @@ const AdminContentPage = ({ title, icon, type }) => {
                 )}
               </Form.Group>
             ))}
+            <Form.Group className="mb-3">
+  <Form.Label> {title.slice(0, -1)} Image</Form.Label>
+
+  <Form.Control
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files[0];
+
+      if (!file) return;
+
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }}
+  />
+</Form.Group>
+
+{preview && (
+  <div className="text-center">
+    <img
+      src={preview}
+      alt="Preview"
+      style={{
+        width: "250px",
+        height: "170px",
+        objectFit: "cover",
+        borderRadius: "12px"
+      }}
+    />
+  </div>
+)}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="outline-secondary" onClick={() => setShowModal(false)}>Cancel</Button>

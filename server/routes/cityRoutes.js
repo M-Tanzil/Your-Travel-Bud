@@ -7,9 +7,15 @@ const upload = require('../middleware/uploadMiddleware');
 
 router.get('/', getCities);
 router.get('/:id', getCity);
-router.post('/', protect, adminMiddleware, createCity);
-router.put('/:id', protect, adminMiddleware, updateCity);
+router.post('/',  protect, adminMiddleware, upload.single('image'), createCity);
+router.put(
+  '/:id',
+  protect,
+  adminMiddleware,
+  upload.single('image'),
+  updateCity
+);
 router.delete('/:id', protect, adminMiddleware, deleteCity);
-router.post('/:id/photos', protect, adminMiddleware, upload.single('photo'), addCityPhoto);
+router.post('/:id/photos', protect, adminMiddleware, upload.single('image'), addCityPhoto);
 
 module.exports = router;
