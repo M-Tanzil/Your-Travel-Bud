@@ -30,10 +30,15 @@ const placeSchema = new mongoose.Schema(
       currency: { type: String, default: 'INR' },
       isFree: { type: Boolean, default: false },
     },
-    location: {
-      address: String,
-      coordinates: { lat: Number, lng: Number },
-    },
+  location: {
+  address: String,
+  landmark: String,
+  googleMapsUrl: String,
+  coordinates: {
+    lat: Number,
+    lng: Number,
+  },
+},
     distanceFromCenter: Number, // in km
     photos: [{ url: String, caption: String }],
     googlePlaceId: String,

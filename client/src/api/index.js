@@ -32,13 +32,27 @@ export const placeAPI = {
 };
 
 // ─── HOTELS ───────────────────────────────────────────────────────
+// ─── HOTELS ───────────────────────────────────────────────────────
 export const hotelAPI = {
   search: (params) => axiosInstance.get('/hotels', { params }),
   getOne: (id) => axiosInstance.get(`/hotels/${id}`),
   compare: (ids) => axiosInstance.get('/hotels/compare', { params: { ids } }),
   searchAmadeus: (params) => axiosInstance.get('/bookings/hotel/search', { params }),
-  create: (data) => axiosInstance.post('/hotels', data),
-  update: (id, data) => axiosInstance.put(`/hotels/${id}`, data),
+
+  create: (data) =>
+    axiosInstance.post('/hotels', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+
+  update: (id, data) =>
+    axiosInstance.put(`/hotels/${id}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+
   delete: (id) => axiosInstance.delete(`/hotels/${id}`),
 };
 

@@ -34,10 +34,15 @@ const hotelSchema = new mongoose.Schema(
       },
     ],
     photos: [{ url: String, caption: String }],
-    location: {
-      address: String,
-      coordinates: { lat: Number, lng: Number },
-    },
+ location: {
+  address: String,
+  landmark: String,
+  googleMapsUrl: String,
+  coordinates: {
+    lat: Number,
+    lng: Number,
+  },
+},
     distanceFromCenter: Number,
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviewCount: { type: Number, default: 0 },
@@ -46,6 +51,7 @@ const hotelSchema = new mongoose.Schema(
     isFeatured: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
   },
+  
   { timestamps: true }
 );
 

@@ -6,10 +6,15 @@ const hiddenGemSchema = new mongoose.Schema(
     cityId: { type: mongoose.Schema.Types.ObjectId, ref: 'City', required: true },
     description: { type: String, required: true },
     story: String, // Local story behind the gem
-    location: {
-      address: String,
-      coordinates: { lat: Number, lng: Number },
-    },
+  location: {
+  address: String,
+  landmark: String,
+  googleMapsUrl: String,
+  coordinates: {
+    lat: Number,
+    lng: Number,
+  },
+},
     distanceFromCenter: Number,
     travelTime: {
       walking: String, // e.g. "25 min"

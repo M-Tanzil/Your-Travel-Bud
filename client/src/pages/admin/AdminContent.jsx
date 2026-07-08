@@ -126,27 +126,38 @@ const [preview, setPreview] = useState("");
         { key: 'category', label: 'Category', type: 'select', options: ['Historical', 'Nature', 'Religious', 'Entertainment', 'Shopping', 'Food', 'Museum', 'Beach', 'Adventure', 'Other'] },
         { key: 'distanceFromCenter', label: 'Distance from Center (km)' },
         { key: 'bestTimeToVisit', label: 'Best Time to Visit' },
+        { key: 'location.address', label: 'Place Address' },
+{ key: 'location.googleMapsUrl', label: 'Google Maps Link' },
       ];
-      case 'hotels': return [
-        { key: 'name', label: 'Hotel Name', required: true },
-        { key: 'description', label: 'Description', type: 'textarea' },
-        { key: 'starRating', label: 'Star Rating (1-5)', type: 'number' },
-        { key: 'priceRange', label: 'Price Range', type: 'select', options: ['budget', 'mid-range', 'luxury'] },
-        { key: 'pricePerNight', label: 'Price Per Night (₹)', type: 'number' },
-        { key: 'isVerified', label: 'Verified', type: 'checkbox' },
-        { key: 'isFeatured', label: 'Featured', type: 'checkbox' },
-      ];
+      case 'hotels':
+  return [
+    { key: 'name', label: 'Hotel Name', required: true },
+    { key: 'description', label: 'Description', type: 'textarea' },
+    { key: 'starRating', label: 'Star Rating (1-5)', type: 'number' },
+    { key: 'priceRange', label: 'Price Range', type: 'select', options: ['budget', 'mid-range', 'luxury'] },
+    { key: 'pricePerNight', label: 'Price Per Night (₹)', type: 'number' },
+
+    { key: 'location.address', label: 'Hotel Address' },
+    { key: 'location.googleMapsUrl', label: 'Google Maps Link' },
+
+    { key: 'isVerified', label: 'Verified', type: 'checkbox' },
+    { key: 'isFeatured', label: 'Featured', type: 'checkbox' },
+  ];
       case 'hiddenGems': return [
         { key: 'name', label: 'Name', required: true },
         { key: 'description', label: 'Description', type: 'textarea', required: true },
         { key: 'story', label: 'Local Story', type: 'textarea' },
         { key: 'hasExpertBadge', label: 'Expert Badge', type: 'checkbox' },
         { key: 'expertName', label: 'Expert Name' },
+        { key: 'location.address', label: 'Location Address' },
+{ key: 'location.googleMapsUrl', label: 'Google Maps Link' },
       ];
       case 'foodShops': return [
         { key: 'name', label: 'Shop Name', required: true },
         { key: 'description', label: 'Description', type: 'textarea' },
         { key: 'priceRange', label: 'Price Range', type: 'select', options: ['budget', 'mid-range', 'expensive'] },
+        { key: 'location.address', label: 'Shop Address' },
+{ key: 'location.googleMapsUrl', label: 'Google Maps Link' },
       ];
       case 'events': return [
         { key: 'name', label: 'Event Name', required: true },
@@ -170,7 +181,32 @@ const [preview, setPreview] = useState("");
       default: return '';
     }
   };
+const handleFieldChange = (key, value) => {
+  if (key.includes(".")) {
+    const [parent, child] = key.split(".");
 
+    setForm((prev) => ({
+      ...prev,
+      [parent]: {
+        ...(prev[parent] || {}),
+        [child]: value,
+      },
+    }));
+  } else {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }
+};
+
+const getFieldValue = (key) => {
+  if (key.includes(".")) {
+    const [parent, child] = key.split(".");
+    return form[parent]?.[child] || "";
+  }
+  return form[key] || "";
+};
   return (
     <div className="dashboard-layout">
       <AdminSidebar />
@@ -238,16 +274,30 @@ const [preview, setPreview] = useState("");
               <Form.Group key={field.key} className="mb-3">
                 <Form.Label>{field.label}{field.required && ' *'}</Form.Label>
                 {field.type === 'textarea' ? (
-                  <Form.Control as="textarea" rows={3} value={form[field.key] || ''} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} required={field.required} />
+                  <Form.Control
+  as="textarea"
+  rows={3}
+  value={getFieldValue(field.key)}
+  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+  required={field.required}
+/>
                 ) : field.type === 'select' ? (
-                  <Form.Select value={form[field.key] || ''} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}>
+                  <Form.Select
+  value={getFieldValue(field.key)}
+  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+>
                     <option value="">Select...</option>
                     {field.options.map((o) => <option key={o} value={o}>{o}</option>)}
                   </Form.Select>
                 ) : field.type === 'checkbox' ? (
                   <Form.Check type="switch" checked={!!form[field.key]} onChange={(e) => setForm({ ...form, [field.key]: e.target.checked })} label={`Enable ${field.label}`} />
                 ) : (
-                  <Form.Control type={field.type || 'text'} value={form[field.key] || ''} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} required={field.required} />
+                  <Form.Control
+  type={field.type || 'text'}
+  value={getFieldValue(field.key)}
+  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+  required={field.required}
+/>
                 )}
               </Form.Group>
             ))}

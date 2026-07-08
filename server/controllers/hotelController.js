@@ -1,5 +1,7 @@
 const Hotel = require('../models/Hotel');
 const { getNearbyPlaces } = require('../services/googleMapsService');
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
 
 const searchHotelsByCity = async (req, res, next) => {
   try {
@@ -65,8 +67,37 @@ const compareHotels = async (req, res, next) => {
 
 const createHotel = async (req, res, next) => {
   try {
-    const hotel = await Hotel.create(req.body);
-    res.status(201).json({ success: true, message: 'Hotel created', data: hotel });
+    // Parse nested location
+    if (req.body.location && typeof req.body.location === "string") {
+      req.body.location = JSON.parse(req.body.location);
+    }
+
+    let photos = [];
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "travel-buddy/hotels",
+      });
+
+      fs.unlinkSync(req.file.path);
+
+      photos.push({
+        url: result.secure_url,
+        caption: req.body.caption || "",
+      });
+    }
+
+    const hotel = await Hotel.create({
+      ...req.body,
+      photos,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Hotel created successfully",
+      data: hotel,
+    });
+
   } catch (error) {
     next(error);
   }
@@ -74,9 +105,44 @@ const createHotel = async (req, res, next) => {
 
 const updateHotel = async (req, res, next) => {
   try {
-    const hotel = await Hotel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!hotel) return res.status(404).json({ success: false, message: 'Hotel not found' });
-    res.json({ success: true, message: 'Hotel updated', data: hotel });
+    if (req.body.location && typeof req.body.location === "string") {
+      req.body.location = JSON.parse(req.body.location);
+    }
+
+    const hotel = await Hotel.findById(req.params.id);
+
+    if (!hotel) {
+      return res.status(404).json({
+        success: false,
+        message: "Hotel not found",
+      });
+    }
+
+    Object.assign(hotel, req.body);
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "travel-buddy/hotels",
+      });
+
+      fs.unlinkSync(req.file.path);
+
+      hotel.photos = [
+        {
+          url: result.secure_url,
+          caption: req.body.caption || "",
+        },
+      ];
+    }
+
+    await hotel.save();
+
+    res.json({
+      success: true,
+      message: "Hotel updated successfully",
+      data: hotel,
+    });
+
   } catch (error) {
     next(error);
   }

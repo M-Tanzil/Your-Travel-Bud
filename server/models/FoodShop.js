@@ -14,10 +14,15 @@ const foodShopSchema = new mongoose.Schema(
         reviewCount: { type: Number, default: 0 },
       },
     ],
-    location: {
-      address: String,
-      coordinates: { lat: Number, lng: Number },
-    },
+  location: {
+  address: String,
+  landmark: String,
+  googleMapsUrl: String,
+  coordinates: {
+    lat: Number,
+    lng: Number,
+  },
+},
     openingHours: {
       open: String,
       close: String,
