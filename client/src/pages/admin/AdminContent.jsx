@@ -119,6 +119,31 @@ const [preview, setPreview] = useState("");
         { key: 'language', label: 'Language' },
         { key: 'climate', label: 'Climate' },
         { key: 'bestSeason', label: 'Best Season', type: 'select', options: ['Spring', 'Summer', 'Autumn', 'Winter', 'Year-round'] },
+      {
+  key: 'averageFoodCostPerDay',
+  label: 'Average Food Cost Per Day (₹)',
+  type: 'number',
+},
+{
+  key: 'averageLocalTransportPerDay',
+  label: 'Average Transport Cost Per Day (₹)',
+  type: 'number',
+},
+{
+  key: 'hotelBudgetPrice',
+  label: 'Budget Hotel Price (₹)',
+  type: 'number',
+},
+{
+  key: 'hotelMidRangePrice',
+  label: 'Mid Range Hotel Price (₹)',
+  type: 'number',
+},
+{
+  key: 'hotelLuxuryPrice',
+  label: 'Luxury Hotel Price (₹)',
+  type: 'number',
+},
       ];
       case 'places': return [
         { key: 'name', label: 'Place Name', required: true },

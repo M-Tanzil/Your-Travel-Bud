@@ -54,6 +54,13 @@ const citySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    hotelBudgetPrice: Number,
+hotelMidRangePrice: Number,
+hotelLuxuryPrice: Number,
+
+averageFoodCostPerDay: Number,
+averageLocalTransportPerDay: Number,
+
   },
   { timestamps: true }
 );

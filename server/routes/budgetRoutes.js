@@ -1,8 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { estimateBudget } = require('../controllers/weatherBudgetLeaderboardController');
-const { protect } = require('../middleware/authMiddleware');
 
-router.post('/estimate', protect, estimateBudget);
+const {
+  estimateBudget,
+} = require("../controllers/budgetController");
+
+router.post(
+  "/estimate",
+  estimateBudget
+);
 
 module.exports = router;

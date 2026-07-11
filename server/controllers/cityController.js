@@ -103,19 +103,6 @@ const createCity = async (req, res, next) => {
 // @route   PUT /api/v1/cities/:id
 const updateCity = async (req, res, next) => {
   try {
-    // Parse JSON fields
-    if (req.body.coordinates && typeof req.body.coordinates === "string") {
-      req.body.coordinates = JSON.parse(req.body.coordinates);
-    }
-
-    if (req.body.publicTransport && typeof req.body.publicTransport === "string") {
-      req.body.publicTransport = JSON.parse(req.body.publicTransport);
-    }
-
-    if (req.body.mustTryFoods && typeof req.body.mustTryFoods === "string") {
-      req.body.mustTryFoods = JSON.parse(req.body.mustTryFoods);
-    }
-
     const city = await City.findById(req.params.id);
 
     if (!city) {
@@ -125,14 +112,35 @@ const updateCity = async (req, res, next) => {
       });
     }
 
-    // Update fields
-    Object.assign(city, req.body);
+    // Parse JSON fields
+    if (req.body.coordinates) {
+      req.body.coordinates = JSON.parse(req.body.coordinates);
+    }
 
-    // Upload new image
+    if (req.body.publicTransport) {
+      req.body.publicTransport = JSON.parse(req.body.publicTransport);
+    }
+
+    if (req.body.mustTryFoods) {
+      req.body.mustTryFoods = JSON.parse(req.body.mustTryFoods);
+    }
+
+    // Remove photos from body to avoid cast error
+    delete req.body.photos;
+
+    // Update fields
+    Object.keys(req.body).forEach((key) => {
+      city[key] = req.body[key];
+    });
+
+    // Only replace image if new one uploaded
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "travel-buddy/cities",
-      });
+      const result = await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          folder: "travel-buddy/cities",
+        }
+      );
 
       fs.unlinkSync(req.file.path);
 
@@ -151,7 +159,6 @@ const updateCity = async (req, res, next) => {
       message: "City updated successfully",
       data: city,
     });
-
   } catch (error) {
     next(error);
   }

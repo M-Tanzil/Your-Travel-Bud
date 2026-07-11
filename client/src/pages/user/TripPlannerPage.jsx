@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Form, Button, Card, Tab, Nav, Alert } from 'react-bootstrap';
+import { Row, Col, Form, Button, Card, Alert } from 'react-bootstrap';
 import { cityAPI, itineraryAPI, budgetAPI } from '../../api';
 import UserSidebar from '../../components/common/UserSidebar';
-import Spinner from '../../components/common/Spinner';
+
 
 const TripPlannerPage = () => {
   const [searchParams] = useSearchParams();

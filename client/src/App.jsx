@@ -19,6 +19,8 @@ import BlogListPage from './pages/public/BlogListPage';
 import BlogDetailPage from './pages/public/BlogDetailPage';
 import { NotFoundPage, AboutPage, FAQPage, TermsPage, PrivacyPage } from './pages/public/StaticPages';
 import HotelPage from "./pages/public/HotelPage";
+import PlacePage from "./pages/public/PlacePage";
+import BudgetPage from './pages/public/BudgetPage';
 
 // Auth pages
 import LoginPage from './pages/auth/LoginPage';
@@ -68,15 +70,17 @@ function App() {
             <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
             <Route path="/explore" element={<PublicLayout><ExplorePage /></PublicLayout>} />
             <Route path="/city/:id" element={<CityPage />} />
+            <Route path="/hotel/:id" element={<PublicLayout><HotelPage /></PublicLayout>} />
+<Route path="/place/:id" element={<PublicLayout><PlacePage /></PublicLayout>} />
+            <Route path="/hidden-gems" element={<HiddenGemsPage />} />
             <Route
-  path="/hotel/:id"
+  path="/budget"
   element={
     <PublicLayout>
-      <HotelPage />
+      <BudgetPage />
     </PublicLayout>
   }
 />
-            <Route path="/hidden-gems" element={<HiddenGemsPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/blogs" element={<BlogListPage />} />
             <Route path="/blogs/:id" element={<BlogDetailPage />} />

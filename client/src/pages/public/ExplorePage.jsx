@@ -7,15 +7,19 @@ import Spinner from '../../components/common/Spinner';
 const TABS = ['Cities', 'Places', 'Hotels'];
 
 const ExplorePage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [tab, setTab] = useState('Cities');
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState(
+  searchParams.get('tab') || 'Cities'
+);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({
-    search: searchParams.get('search') || '',
-    category: '',
-    priceRange: '',
-  });
+ const [filters, setFilters] = useState({
+  search: searchParams.get('search') || '',
+  category: '',
+  priceRange: '',
+  cityId: searchParams.get('cityId') || '',
+});
+  
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({});
 
@@ -26,7 +30,11 @@ const ExplorePage = () => {
       const params = { page, limit: 12, ...filters };
       if (tab === 'Cities') res = await cityAPI.getAll(params);
       else if (tab === 'Places') res = await placeAPI.getAll({ ...params, category: filters.category });
-      else res = await hotelAPI.search({ ...params, priceRange: filters.priceRange });
+      else res = await hotelAPI.search({
+    ...params,
+    cityId: filters.cityId,
+    priceRange: filters.priceRange,
+  });
       setData(res.data.data);
       setPagination(res.data.pagination);
     } catch {}
@@ -34,6 +42,21 @@ const ExplorePage = () => {
   };
 
   useEffect(() => { fetchData(); }, [tab, page, filters]);
+  useEffect(() => {
+  const urlTab = searchParams.get("tab");
+  const cityId = searchParams.get("cityId");
+
+  if (urlTab) {
+    setTab(urlTab);
+  }
+
+  if (cityId) {
+    setFilters((prev) => ({
+      ...prev,
+      cityId,
+    }));
+  }
+}, [searchParams]);
 
   const handleFilter = (key, val) => {
     setFilters((f) => ({ ...f, [key]: val }));

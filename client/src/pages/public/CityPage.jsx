@@ -64,7 +64,7 @@ const CityPage = () => {
       <Container className="py-4">
         <div className="d-flex gap-3 mb-4 flex-wrap">
           <Link to={`/plan-trip?cityId=${city._id}&city=${city.name}`} className="btn btn-primary">🗺️ Plan a Trip Here</Link>
-          <Link to={`/hotels?cityId=${city._id}`} className="btn btn-outline-primary">🏨 Find Hotels</Link>
+          <Link to={`/explore?tab=Hotels&cityId=${city._id}`} className="btn btn-outline-primary">🏨 Find Hotels</Link>
           <Link to={`/hidden-gems?cityId=${city._id}`} className="btn btn-outline-primary">💎 Hidden Gems</Link>
         </div>
 

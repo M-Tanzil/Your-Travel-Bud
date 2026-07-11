@@ -39,6 +39,12 @@ const placeSchema = new mongoose.Schema(
     lng: Number,
   },
 },
+photos: [
+  {
+    url: String,
+    caption: String,
+  },
+],
     distanceFromCenter: Number, // in km
     photos: [{ url: String, caption: String }],
     googlePlaceId: String,

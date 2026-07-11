@@ -9,12 +9,25 @@ const wishlistSchema = new mongoose.Schema(
       unique: true,
     },
     items: [
-      {
-        itemId: { type: mongoose.Schema.Types.ObjectId, required: true },
-        itemType: { type: String, enum: ['place', 'hotel', 'food'], required: true },
-        addedAt: { type: Date, default: Date.now },
-      },
-    ],
+  {
+    itemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      refPath: "items.itemType",
+    },
+
+    itemType: {
+      type: String,
+      required: true,
+      enum: ["Place", "Hotel", "FoodShop"],
+    },
+
+    addedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+],
   },
   { timestamps: true }
 );

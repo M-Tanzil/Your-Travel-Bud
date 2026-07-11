@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { wishlistAPI, bookingAPI } from "../../api";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Row,
@@ -13,14 +14,76 @@ import { hotelAPI } from "../../api";
 
 const HotelPage = () => {
   const { id } = useParams();
-
+const navigate = useNavigate();
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
 
+
   useEffect(() => {
     loadHotel();
   }, [id]);
+  const [bookingData, setBookingData] = useState({
+  roomType: "single",
+  checkIn: "",
+  checkOut: "",
+  adults: 1,
+  children: 0,
+  rooms: 1,
+});
+ const handleBookNow = async () => {
+  try {
+    if (!bookingData.checkIn || !bookingData.checkOut) {
+      return alert("Please select check-in and check-out dates.");
+    }
+
+    const totalPrice =
+      (hotel.pricePerNight || 0) *
+      bookingData.rooms;
+
+    const payload = {
+      hotelId: hotel._id,
+      roomType: bookingData.roomType,
+      checkIn: bookingData.checkIn,
+      checkOut: bookingData.checkOut,
+
+      guests: {
+        adults: Number(bookingData.adults),
+        children: Number(bookingData.children),
+      },
+
+      rooms: Number(bookingData.rooms),
+
+      totalPrice,
+    };
+
+    const res = await bookingAPI.bookHotel(payload);
+
+    alert(
+      `Booking Successful 🎉\nReference: ${res.data.data.bookingReference}`
+    );
+  } catch (err) {
+    alert(
+      err.response?.data?.message ||
+      "Booking failed"
+    );
+  }
+};
+const handleWishlist = async () => {
+  try {
+    await wishlistAPI.add({
+      itemId: hotel._id,
+      itemType: "Hotel",
+    });
+
+    alert("Added to wishlist ❤️");
+  } catch (err) {
+    alert(
+      err.response?.data?.message ||
+      "Failed to add wishlist"
+    );
+  }
+};
 
   const loadHotel = async () => {
     try {
@@ -80,9 +143,10 @@ const HotelPage = () => {
 
             <img
               src={
-                selectedImage ||
-                "https://placehold.co/900x500?text=No+Image"
-              }
+  selectedImage ||
+  hotel.photos?.[0]?.url ||
+  "https://placehold.co/900x500?text=No+Image"
+}
               alt={hotel.name}
               style={{
                 width: "100%",
@@ -102,8 +166,9 @@ const HotelPage = () => {
                 <Col xs={3} key={index}>
 
                   <img
-                    src={photo.url}
-                    alt=""
+  src={photo.url}
+  alt={photo.caption || hotel.name}
+  title={photo.caption || hotel.name}
                     onClick={() => setSelectedImage(photo.url)}
                     style={{
                       width: "100%",
@@ -169,28 +234,159 @@ const HotelPage = () => {
               <hr />
 
               <h4 className="text-success">
-
-                ₹{hotel.pricePerNight}
-
-              </h4>
+  {hotel.pricePerNight
+    ? `₹${hotel.pricePerNight}`
+    : "Price not available"}
+</h4>
 
               <small>
 
                 Per Night
 
               </small>
+              
 
               <p className="mt-3">
 
                 {hotel.description}
 
               </p>
+              <Card className="mt-3 border-0 bg-light">
+  <Card.Body>
+
+    <h6 className="fw-bold mb-3">
+      Book this Hotel
+    </h6>
+
+    <div className="mb-2">
+      <label>Room Type</label>
+
+      <select
+        className="form-control"
+        value={bookingData.roomType}
+        onChange={(e) =>
+          setBookingData({
+            ...bookingData,
+            roomType: e.target.value,
+          })
+        }
+      >
+        <option value="single">Single</option>
+        <option value="double">Double</option>
+        <option value="suite">Suite</option>
+        <option value="deluxe">Deluxe</option>
+        <option value="family">Family</option>
+      </select>
+    </div>
+
+    <div className="mb-2">
+      <label>Check In</label>
+
+      <input
+        type="date"
+        className="form-control"
+        value={bookingData.checkIn}
+        onChange={(e) =>
+          setBookingData({
+            ...bookingData,
+            checkIn: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div className="mb-2">
+      <label>Check Out</label>
+
+      <input
+        type="date"
+        className="form-control"
+        value={bookingData.checkOut}
+        onChange={(e) =>
+          setBookingData({
+            ...bookingData,
+            checkOut: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div className="mb-2">
+      <label>Adults</label>
+
+      <input
+        type="number"
+        min="1"
+        className="form-control"
+        value={bookingData.adults}
+        onChange={(e) =>
+          setBookingData({
+            ...bookingData,
+            adults: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div className="mb-2">
+      <label>Children</label>
+
+      <input
+        type="number"
+        min="0"
+        className="form-control"
+        value={bookingData.children}
+        onChange={(e) =>
+          setBookingData({
+            ...bookingData,
+            children: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div className="mb-3">
+      <label>Rooms</label>
+
+      <input
+        type="number"
+        min="1"
+        className="form-control"
+        value={bookingData.rooms}
+        onChange={(e) =>
+          setBookingData({
+            ...bookingData,
+            rooms: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <Button
+      variant="success"
+      className="w-100"
+      onClick={handleBookNow}
+    >
+      🏨 Book Now
+    </Button>
+
+  </Card.Body>
+</Card>
+<Button
+  variant="outline-danger"
+  className="w-100 mt-2"
+  onClick={handleWishlist}
+>
+  ❤️ Add to Wishlist
+</Button>
 
               <p>
 
                 <strong>City :</strong>{" "}
 
-                {hotel.cityId?.name}
+                <Link to={`/city/${hotel.cityId?._id}`}>
+  {hotel.cityId?.name}
+</Link>
 
               </p>
 
@@ -292,8 +488,8 @@ const HotelPage = () => {
                       <h5>{room.type}</h5>
 
                       <h3 className="text-success">
-                        ₹{room.price}
-                      </h3>
+  {room.price ? `₹${room.price}` : "Price unavailable"}
+</h3>
 
                       <p>
                         Capacity : {room.capacity} Guests
@@ -355,25 +551,50 @@ const HotelPage = () => {
 
           )}
 
-          <div className="mt-4">
+         <div className="mt-4">
 
-            {hotel.location?.coordinates?.lat && (
+  {hotel.location?.coordinates?.lat ? (
 
-              <iframe
-                title="Hotel Map"
-                width="100%"
-                height="350"
-                style={{
-                  border: 0,
-                  borderRadius: "12px",
-                }}
-                loading="lazy"
-                src={`https://www.google.com/maps?q=${hotel.location.coordinates.lat},${hotel.location.coordinates.lng}&output=embed`}
-              />
+    <iframe
+      title="Hotel Map"
+      width="100%"
+      height="350"
+      style={{
+        border: 0,
+        borderRadius: "12px",
+      }}
+      loading="lazy"
+      src={`https://www.google.com/maps?q=${hotel.location.coordinates.lat},${hotel.location.coordinates.lng}&output=embed`}
+    />
 
-            )}
+  ) : hotel.location?.googleMapsUrl ? (
 
-          </div>
+    <div className="text-center py-4">
+
+      <p style={{ color: "gray" }}>
+        Map preview not available.
+      </p>
+
+      <Button
+        variant="outline-primary"
+        href={hotel.location.googleMapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        📍 Open in Google Maps
+      </Button>
+
+    </div>
+
+  ) : (
+
+    <p style={{ color: "gray" }}>
+      Location information not available.
+    </p>
+
+  )}
+
+</div>
 
         </Card.Body>
 

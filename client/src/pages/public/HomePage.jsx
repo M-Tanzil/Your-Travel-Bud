@@ -67,21 +67,78 @@ const HomePage = () => {
           <p className="section-subtitle text-center">One platform for your complete travel experience</p>
           <Row className="g-4">
             {[
-              { icon: '🗺️', title: 'AI Trip Planner', desc: 'Generate a complete day-by-day itinerary with AI or build your own custom plan.' },
-              { icon: '🏨', title: 'Hotel Booking', desc: 'Search and book hotels with real-time availability, room selection, and instant confirmation.' },
-              { icon: '🚂', title: 'Train & Bus Booking', desc: 'Book train and bus tickets with seat maps, filters, and e-tickets.' },
-              { icon: '💎', title: 'Hidden Gems', desc: 'Discover lesser-known spots and famous local food curated by local experts.' },
-              { icon: '☀️', title: 'Weather Forecast', desc: 'Check day-by-day weather for your travel dates before you go.' },
-              { icon: '💰', title: 'Budget Estimator', desc: 'Get a complete cost breakdown for your trip including hotel, transport, and food.' },
-            ].map((f) => (
-              <Col key={f.title} sm={6} md={4}>
-                <div className="tb-card p-4 h-100">
-                  <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{f.icon}</div>
-                  <h5 className="fw-bold mb-2">{f.title}</h5>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: 0 }}>{f.desc}</p>
-                </div>
-              </Col>
-            ))}
+  {
+    icon: "🏨",
+    title: "Hotel Booking",
+    desc: "Search and book hotels with real-time availability.",
+    link: "/explore",
+  },
+  {
+    icon: "🚂",
+    title: "Train & Bus Booking",
+    desc: "Book train and bus tickets.",
+    link: "/my-bookings",
+  },
+  {
+    icon: "💎",
+    title: "Hidden Gems",
+    desc: "Discover lesser-known spots.",
+    link: "/hidden-gems",
+  },
+  {
+    icon: "☀️",
+    title: "Weather Forecast",
+    desc: "Check weather before travelling.",
+    link: "/explore",
+  },
+  {
+    icon: "💰",
+    title: "Budget Estimator",
+    desc: "Estimate your trip budget.",
+    link: "/budget",
+  },
+].map((f) => (
+  <Col key={f.title} sm={6} md={4}>
+    <Link
+      to={f.link}
+      style={{
+        textDecoration: "none",
+        color: "inherit",
+      }}
+    >
+      <div
+        className="tb-card p-4 h-100"
+        style={{
+          cursor: "pointer",
+          transition: "0.3s",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "2.5rem",
+            marginBottom: "1rem",
+          }}
+        >
+          {f.icon}
+        </div>
+
+        <h5 className="fw-bold mb-2">
+          {f.title}
+        </h5>
+
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontSize: "0.9rem",
+            margin: 0,
+          }}
+        >
+          {f.desc}
+        </p>
+      </div>
+    </Link>
+  </Col>
+))}
           </Row>
         </Container>
       </section>
