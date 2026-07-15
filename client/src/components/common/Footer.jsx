@@ -48,7 +48,20 @@ const Footer = () => (
       <hr style={{ borderColor: '#334155' }} />
       <div className="d-flex justify-content-between align-items-center flex-wrap gap-2" style={{ fontSize: '0.85rem' }}>
         <span>© {new Date().getFullYear()} Travel Buddy. All rights reserved.</span>
-        <span>Made with ❤️ for travellers</span>
+        <span>
+  Made with ❤️ for travellers By{" "}
+  <a
+    href="https://www.linkedin.com/in/md-tanzil-257bb12a0/"
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      color: "inherit",
+      fontWeight: "600",
+    }}
+  >
+    Md Tanzil
+  </a>
+</span>
       </div>
     </Container>
   </footer>
