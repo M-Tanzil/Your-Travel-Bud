@@ -92,6 +92,12 @@ const HomePage = () => {
     link: "/explore",
   },
   {
+  icon: '🗺️',
+  title: 'AI Trip Planner',
+  desc: 'Generate a complete day-by-day itinerary with AI or build your own custom plan.',
+  link: '/plan-trip',
+},
+  {
     icon: "💰",
     title: "Budget Estimator",
     desc: "Estimate your trip budget.",
