@@ -39,4 +39,3 @@ A full-stack MERN travel planning platform — your all-in-one companion for pla
 
 
 
-GET https://your-render-url.onrender.com/api/v1/cities
