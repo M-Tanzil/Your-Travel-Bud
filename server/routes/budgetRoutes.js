@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   estimateBudget,
-} = require("../controllers/budgetController");
+} = require("../controllers/budgetController.js");
 
 router.post(
   "/estimate",

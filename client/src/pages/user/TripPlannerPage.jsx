@@ -17,14 +17,15 @@ const TripPlannerPage = () => {
   const [aiPlan, setAiPlan] = useState(null);
 
   const [form, setForm] = useState({
-    cityId: searchParams.get('cityId') || '',
-    cityName: searchParams.get('city') || '',
-    title: '',
-    startDate: '',
-    endDate: '',
-    travelers: { adults: 1, children: 0 },
-    mode: 'ai', // ai | manual
-  });
+  cityId: searchParams.get('cityId') || '',
+  cityName: searchParams.get('city') || '',
+  title: '',
+  startDate: '',
+  endDate: '',
+  travelers: { adults: 1, children: 0 },
+  budgetType: 'mid-range',
+  mode: 'ai',
+});
 
   useEffect(() => {
     cityAPI.getAll({ limit: 50 }).then((r) => setCities(r.data.data)).catch(() => {});
@@ -42,20 +43,24 @@ const TripPlannerPage = () => {
     setAiLoading(true);
     try {
       const res = await itineraryAPI.aiGenerate({
-        cityId: form.cityId,
-        cityName: form.cityName,
-        startDate: form.startDate,
-        endDate: form.endDate,
-        travelers: form.travelers,
-      });
+  cityId: form.cityId,
+  cityName: form.cityName,
+  startDate: form.startDate,
+  endDate: form.endDate,
+  travelers: form.travelers,
+  budgetType: form.budgetType,
+});
       setItinerary(res.data.data.itinerary);
       setAiPlan(res.data.data.aiPlan);
 
       // Estimate budget
       const budgetRes = await budgetAPI.estimate({
-        days: getDays(),
-        travelers: form.travelers,
-      });
+  cityId: form.cityId,
+  days: getDays(),
+  travelers: form.travelers,
+  hotelType: "mid-range",
+  transport: "train",
+});
       setBudget(budgetRes.data.data);
       setStep('plan');
     } catch (err) {
@@ -157,6 +162,31 @@ const TripPlannerPage = () => {
                 <Form.Label>Children</Form.Label>
                 <Form.Control type="number" min={0} value={form.travelers.children} onChange={(e) => handleChange('travelers', { ...form.travelers, children: +e.target.value })} />
               </Col>
+              <Col sm={12}>
+  <Form.Label>Your Budget</Form.Label>
+
+  <Form.Select
+    value={form.budgetType}
+    onChange={(e) =>
+      handleChange(
+        "budgetType",
+        e.target.value
+      )
+    }
+  >
+    <option value="budget">
+      💸 Budget
+    </option>
+
+    <option value="mid-range">
+      💰 Mid Range
+    </option>
+
+    <option value="luxury">
+      👑 Luxury
+    </option>
+  </Form.Select>
+</Col>
 
               <Col sm={12}>
                 <Form.Label>Planning Mode</Form.Label>

@@ -6,22 +6,32 @@ const estimateBudget = async (
 ) => {
   try {
     const {
-      cityId,
-      days,
-      travelers,
-      hotelType,
-      transport,
-    } = req.body;
+  cityId,
+  days,
+  travelers,
+  hotelType,
+  transport,
+} = req.body;
 
-    const city =
-      await City.findById(cityId);
+if (!cityId) {
+  return res.status(400).json({
+    success: false,
+    message: "City ID is required",
+  });
+}
 
-    if (!city) {
-      return res.status(404).json({
-        success: false,
-        message: "City not found",
-      });
-    }
+const city = await City.findById(cityId);
+
+if (!city) {
+  return res.status(404).json({
+    success: false,
+    message: "City not found",
+  });
+}
+
+const travelerCount =
+  Number(travelers?.adults || 0) +
+  Number(travelers?.children || 0);
 
     let hotelRate = 0;
 
@@ -54,25 +64,25 @@ const estimateBudget = async (
     const hotelCost =
       hotelRate *
       Number(days) *
-      Number(travelers);
+      travelerCount;
 
     const foodCost =
       (city.averageFoodCostPerDay ||
         800) *
       Number(days) *
-      Number(travelers);
+      travelerCount;
 
     const localTransportCost =
       (city.averageLocalTransportPerDay ||
         500) *
       Number(days) *
-      Number(travelers);
+      travelerCount;
 
     const travelTransportCost =
       (transportRates[
         transport
       ] || 0) *
-      Number(travelers);
+      travelerCount;
 
     const transportCost =
       localTransportCost +
@@ -84,15 +94,17 @@ const estimateBudget = async (
       transportCost;
 
     res.json({
-      success: true,
-      data: {
-        city: city.name,
-        hotelCost,
-        foodCost,
-        transportCost,
-        totalBudget,
-      },
-    });
+  success: true,
+  data: {
+    city: city.name,
+    breakdown: {
+      hotel: hotelCost,
+      food: foodCost,
+      transport: transportCost,
+    },
+    total: totalBudget,
+  },
+});
   } catch (error) {
     next(error);
   }

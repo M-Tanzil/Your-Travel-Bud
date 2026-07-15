@@ -63,13 +63,27 @@ const createItinerary = async (req, res, next) => {
 // @route   POST /api/v1/itineraries/ai-generate
 const aiGenerateItinerary = async (req, res, next) => {
   try {
-    const { cityId, cityName, startDate, endDate, travelers, preferences } = req.body;
+    const {
+  cityId,
+  cityName,
+  startDate,
+  endDate,
+  travelers,
+  preferences,
+  budgetType,
+} = req.body;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
     const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
-    const aiPlan = await generateItinerary({ city: cityName, days, travelers, preferences });
+    const aiPlan = await generateItinerary({
+  city: cityName,
+  days,
+  travelers,
+  preferences,
+  budgetType,
+});
 
     // Build itinerary days from AI response
     const itineraryDays = aiPlan.days.map((day, index) => ({
